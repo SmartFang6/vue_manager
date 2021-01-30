@@ -152,6 +152,12 @@
 		color: #333;
 		text-align: center;
 	}
+	.el-menu{
+		background-color: #D3DCE6;
+	}
+	.el-menu-item{
+		background-color: #e1e1e1;
+	}
 
 	.el-submenu .el-submenu__title {
 		padding-left: 0 !important;
