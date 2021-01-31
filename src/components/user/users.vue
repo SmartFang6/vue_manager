@@ -1,10 +1,6 @@
 <template>
 	<el-card class="box-card">
-		<el-breadcrumb separator="/">
-			<el-breadcrumb-item class="home">首页</el-breadcrumb-item>
-			<el-breadcrumb-item>用户管理</el-breadcrumb-item>
-			<el-breadcrumb-item>内容管理</el-breadcrumb-item>
-		</el-breadcrumb>
+		<my-bread :list="['用户管理','内容管理']"></my-bread>
 		<el-row>
 			<el-col class="search_box">
 				<el-input placeholder="请输入内容" v-model="query" @clear="clear" clearable class="input-with-select">
@@ -277,9 +273,7 @@
 		height: calc(100% - 20px);
 	}
 
-	.home {
-		font-weight: bold;
-	}
+	
 
 	.search_box {
 		display: flex;
