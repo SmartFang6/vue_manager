@@ -35,7 +35,7 @@
 						<template slot-scope="userList">
 							<el-button type="primary" size="mini" @click="editUser(userList.row)" plain icon="el-icon-edit" circle></el-button>
 							<el-button type="danger" size="mini" @click="dorpUser(userList.row)" plain icon="el-icon-delete" circle></el-button>
-							<el-button type="success" size="mini" plain icon="el-icon-check" circle></el-button>
+							<el-button type="success" size="mini" @click="showSetUserRole(userList.row)" plain icon="el-icon-check" circle></el-button>
 						</template>
 					</el-table-column>
 				</el-table>
@@ -65,21 +65,38 @@
 				<el-button type="primary" @click="addUser">确 定</el-button>
 			</div>
 		</el-dialog>
-		<el-dialog title="修改用户信息" :visible.sync="showEditUser">
-			<el-form :model="nowUserInfo">
+		<el-dialog title="修改用户信息" @close="newUserInfo = {}" :visible.sync="showEditUser">
+			<el-form :model="newUserInfo">
 				<el-form-item label="用户名" label-width="110px">
-					<el-input v-model="nowUserInfo.username" disabled autocomplete="off"></el-input>
+					<el-input v-model="newUserInfo.username" disabled autocomplete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="手机号" label-width="110px">
-					<el-input v-model="nowUserInfo.mobile" autocomplete="off"></el-input>
+					<el-input v-model="newUserInfo.mobile" autocomplete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="邮箱" label-width="110px">
-					<el-input v-model="nowUserInfo.email" autocomplete="off"></el-input>
+					<el-input v-model="newUserInfo.email" autocomplete="off"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="showEditUser = false">取 消</el-button>
 				<el-button type="primary" @click="confirmEditUser">确 定</el-button>
+			</div>
+		</el-dialog>
+		<el-dialog title="分配角色" :visible.sync="showUserRole">
+			<el-form :model="newUserInfo">
+				<el-form-item label="用户名" label-width="110px">
+					{{currRoleName}}
+				</el-form-item>
+				<el-form-item label="角色" label-width="110px">
+				<el-select v-model="currentRoleId" placeholder="请选择活动区域">
+					<el-option label="请选择" :value="-1" disabled></el-option>
+					<el-option v-for="item in rolesList" :key="item.id" :label="item.roleName" :value="item.id"></el-option>
+					</el-select>
+				</el-form-item>
+			</el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button @click="showUserRole = false">取 消</el-button>
+				<el-button type="primary" @click="confirmSetUserRole">确 定</el-button>
 			</div>
 		</el-dialog>
 	</el-card>
@@ -102,11 +119,12 @@
 					mobile: '',
 					email: ''
 				},
-				nowUserInfo: {
-
-				},
 				showEditUser: false,
-				currentUserId: 0
+				currentUserId: 0,
+				currentRoleId:-1,
+				showUserRole:false,
+				currRoleName:'',
+				rolesList:[]
 			}
 		},
 		props: {},
@@ -115,6 +133,28 @@
 			this._getUserData()
 		},
 		methods: {
+			async showSetUserRole(item){
+				this.currRoleName = item.username;
+				let id = item.id;
+				this.currentUserId = id;
+				let roles = await this.$http.get('roles');
+				this.rolesList = roles.data;
+				let res = await	this.$http.get('users/'+id);
+				this.currentRoleId = res.data.rid;
+				console.log(res.data.rid)
+				this.showUserRole = true;
+			},
+			async confirmSetUserRole(){
+				let id = this.currentUserId;
+				let res = await this.$http.put(`users/${id}/role`,{rid:this.currentRoleId});
+				let {status,msg} = res.meta;
+				this.showUserRole = false;
+				if(status === 200){
+					this.$message.success(msg)
+				}else{
+					this.$message.error(msg)
+				}
+			},
 			async switchStatus(item){
 				let {id,mg_state} = item;
 				let res = await	this.$http.put(`users/${id}/state/${mg_state}`);
@@ -150,7 +190,7 @@
 					id
 				} = item;
 				this.currentUserId = id;
-				this.nowUserInfo = {
+				this.newUserInfo = {
 					username,
 					mobile,
 					email
@@ -159,13 +199,13 @@
 			},
 			async confirmEditUser() {
 				let {
-					nowUserInfo,
+					newUserInfo,
 					currentUserId
 				} = this;
-				let res = await this.$http.put('users/' + currentUserId, nowUserInfo);
+				let res = await this.$http.put('users/' + currentUserId, newUserInfo);
 				this.showEditUser=false;
-				let {data,meta:{msg,status}} = res;
-				console.log(data);
+				let {meta:{msg,status}} = res;
+				this.newUserInfo = {}
 				if(status === 200){
 					this.$message.success(msg)
 					this._getUserData()	
