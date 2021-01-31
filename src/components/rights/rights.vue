@@ -21,7 +21,6 @@
 	let levelArr = ['一', '二', '三', '四', '五']
 	export default {
 		name: 'rights',
-		components: {},
 		filters: {
 			formatLevel(num) {
 				return levelArr[num] + '层'
