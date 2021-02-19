@@ -18,66 +18,14 @@
 		<el-container class="main">
 			<el-aside class="el-aside" width="200px">
 				<el-menu unique-opened router>
-					<el-submenu index="1">
+					<el-submenu :index="item.order+''" v-for="item in menuList" :key="item.id">
 						<template slot="title">
-							<i class="el-icon-user-solid"></i>
-							<span>用户管理</span>
+							<!-- <i class="el-icon-user-solid"></i> -->
+							<span>{{item.authName}}</span>
 						</template>
-						<el-menu-item index="users">
-							<i class="el-icon-location"></i>
-							<span>用户列表</span>
-						</el-menu-item>
-					</el-submenu>
-					<el-submenu index="2">
-						<template slot="title">
-							<i class="el-icon-lock"></i>
-							<span>权限管理</span>
-						</template>
-						<el-menu-item index="role">
-							<i class="el-icon-location"></i>
-							<span>角色列表</span>
-						</el-menu-item>
-						<el-menu-item index="rights">
-							<i class="el-icon-location"></i>
-							<span>权限列表</span>
-						</el-menu-item>
-					</el-submenu>
-					<el-submenu index="3">
-						<template slot="title">
-							<i class="el-icon-s-goods"></i>
-							<span>商品管理</span>
-						</template>
-						<el-menu-item index="1-1">
-							<i class="el-icon-location"></i>
-							<span>商品列表</span>
-						</el-menu-item>
-						<el-menu-item index="1-2">
-							<i class="el-icon-location"></i>
-							<span>分类参数</span>
-						</el-menu-item>
-						<el-menu-item index="1-3">
-							<i class="el-icon-location"></i>
-							<span>商品分类</span>
-						</el-menu-item>
-					</el-submenu>
-					<el-submenu index="4">
-						<template slot="title">
-							<i class="el-icon-s-order"></i>
-							<span>订单管理</span>
-						</template>
-						<el-menu-item index="1-1">
-							<i class="el-icon-location"></i>
-							<span>订单列表</span>
-						</el-menu-item>
-					</el-submenu>
-					<el-submenu index="5">
-						<template slot="title">
-							<i class="el-icon-s-data"></i>
-							<span>数据统计</span>
-						</template>
-						<el-menu-item index="1-1">
-							<i class="el-icon-location"></i>
-							<span>数据列表</span>
+						<el-menu-item :index="c.path" v-for="c in item.children" :key="c.id">
+							<!-- <i class="el-icon-location"></i> -->
+							<span>{{c.authName}}</span>
 						</el-menu-item>
 					</el-submenu>
 				</el-menu>
@@ -94,20 +42,20 @@
 		name: 'home',
 		components: {},
 		data() {
-			return {};
+			return {
+				menuList: []
+			};
 		},
-		beforeCreate() {
-			const token = localStorage.getItem('token');
-			if (!token) {
-				this.$message.error('请先登录！');
-				this.$router.replace({
-					name: 'login'
-				})
-			}
+		created() {
+			this._getMenuData()
 		},
-		props: {},
 		computed: {},
 		methods: {
+			async _getMenuData() {
+				//获取导航数据
+				let res = await this.$http.get('menus');
+				this.menuList = res.data;
+			},
 			exit() {
 				this.$confirm('确定要退出登录吗?', '提示', {
 					confirmButtonText: '确定',
@@ -152,10 +100,12 @@
 		color: #333;
 		text-align: center;
 	}
-	.el-menu{
+
+	.el-menu {
 		background-color: #D3DCE6;
 	}
-	.el-menu-item{
+
+	.el-menu-item {
 		background-color: #e1e1e1;
 	}
 

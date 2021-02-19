@@ -24,8 +24,7 @@
 											<i class="el-icon-arrow-right"></i>
 										</el-col>
 										<el-col :span="20">
-											<el-tag @close="deleteRole(rolesList.row,grandson.id)" closable class="grandson" v-for="grandson in son.children"
- :key="grandson.id" type="warning">{{grandson.authName}}</el-tag>
+											<el-tag @close="deleteRole(rolesList.row,grandson.id)" closable class="grandson" v-for="grandson in son.children"	 :key="grandson.id" type="warning">{{grandson.authName}}</el-tag>
 										</el-col>
 									</el-row>
 								</el-col>
@@ -60,7 +59,7 @@
 </template>
 <script>
 	export default {
-		name: 'role',
+		name: 'roles',
 		components: {},
 		data() {
 			return {
@@ -72,7 +71,7 @@
 					label: 'authName'
 				},
 				selectedArr: [],
-				currRoleId:-1
+				currRoleId: -1
 			};
 		},
 		created() {
@@ -119,16 +118,19 @@
 				this.currRoleId = item.id;
 				this.showUserRole = true;
 			},
-		async	confirmSetUserRole() {
-			let rids = this.$refs.tree.getCheckedKeys().concat(this.$refs.tree.getHalfCheckedKeys());
-			let res = await	this.$http.post(`roles/${this.currRoleId}/rights`,{
-					rids:rids.join(',')
+			async confirmSetUserRole() {
+				let rids = this.$refs.tree.getCheckedKeys().concat(this.$refs.tree.getHalfCheckedKeys());
+				let res = await this.$http.post(`roles/${this.currRoleId}/rights`, {
+					rids: rids.join(',')
 				})
 				console.log(res);
-				let {msg,status} = res.meta;
-				if(status === 200){
+				let {
+					msg,
+					status
+				} = res.meta;
+				if (status === 200) {
 					this.$message.success(msg)
-				}else{
+				} else {
 					this.$message.error(msg)
 				}
 				this.selectedArr = [];

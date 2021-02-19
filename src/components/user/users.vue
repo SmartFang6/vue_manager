@@ -155,6 +155,7 @@
 				let {id,mg_state} = item;
 				let res = await	this.$http.put(`users/${id}/state/${mg_state}`);
 				let {msg,status} = res.meta;
+				console.log(item,res);
 				if(status === 200){
 					this.$message.success(msg)
 				}else{
@@ -231,7 +232,7 @@
 					query,
 					pagenum
 				} = this;
-				let res = await this.$http.get(`users?query=${query}&pagesize=${pagesize}&pagenum=${pagenum}`)
+				let res = await this.$http.get(`users?query=${query}&pagesize=${pagesize}&pagenum=${pagenum}`);
 				let {
 					data: {
 						total,

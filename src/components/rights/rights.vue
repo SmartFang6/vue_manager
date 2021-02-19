@@ -34,7 +34,6 @@
 		methods: {
 			async _getRightsData() {
 				let res = await this.$http.get('rights/list');
-				console.log(res)
 				this.rightsList = res.data;
 			}
 		},
@@ -45,10 +44,6 @@
 </script>
 
 <style scoped>
-	.card-box {
-		/* height: calc(100vh - 100px);
-		overflow-y: scroll; */
-	}
 
 	.table {
 		margin-top: 20px;
